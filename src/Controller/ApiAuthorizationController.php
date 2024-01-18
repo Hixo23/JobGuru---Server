@@ -30,7 +30,6 @@ class ApiAuthorizationController extends AbstractController
 
         if (empty($body["username"]) || empty($body["email"]) || empty($body['email'])) {
             return $this->json([
-                "status" => "false",
                 "message" => "Invalid credentials"
             ]);
         }
@@ -39,7 +38,6 @@ class ApiAuthorizationController extends AbstractController
 
         if ($userExist) {
             return $this->json([
-                "status" => false,
                 "message" => "User with this email already exist"
             ]);
         }
@@ -58,7 +56,6 @@ class ApiAuthorizationController extends AbstractController
 
         return $this->json([
             'message' => 'user created',
-            'status' => true
         ]);
     }
     #[Route('/api/user')]
@@ -69,15 +66,15 @@ class ApiAuthorizationController extends AbstractController
         if ($currentUser instanceof User) {
             $user = [
                 "username" => $currentUser->getUsername(),
-                "email" => $currentUser->getEmail()
+                "email" => $currentUser->getEmail(),
+                "offers" => $currentUser->getOffers()
             ];
 
             return $this->json([
-                "status" => true,
-                "user" => $user
+                "user" => $user,
             ]);
         }
 
-        return $this->json(["status" => false, "message" => "user is not logged in"], 401);
+        return $this->json(["message" => "user is not logged in"], 401);
     }
 }

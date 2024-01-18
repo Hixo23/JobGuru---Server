@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Offer;
+use App\Entity\User;
 use App\Repository\OfferRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +23,9 @@ class OfferController extends AbstractController
     #[Route('/api/offers', name: 'app_offer', methods: ["get"])]
     public function index(): JsonResponse
     {
+
         $offers = $this->offerRepository->findAll();
+
 
         $offersArray = array_map(function ($offer) {
             return [
@@ -30,24 +33,24 @@ class OfferController extends AbstractController
                 "description" => $offer->getDescription(),
                 "salary" => $offer->getSalary(),
                 "technologies" => $offer->getTechnologies(),
-                "location" => $offer->getLocation()
+                "location" => $offer->getLocation(),
+                "company" => $offer->getCompany(),
             ];
         }, $offers);
 
         return $this->json([
-            "status" => true,
             "offers" => $offersArray
         ]);
     }
 
-    #[Route('/api/offers', name: "add_offer", methods: ["post"])]
+    #[Route('/api/offers/add', name: "add_offer", methods: ["post"])]
     public function addOffer(Request $request): JsonResponse
     {
         $body = json_decode($request->getContent(), true);
+        $currentUser = $this->getUser();
 
-        if (empty($body["title"]) || empty($body["description"]) || empty($body["location"]) || empty($body["technologies"]) || empty($body["salary"])) {
+        if (empty($body["title"]) || empty($body["description"]) || empty($body["location"]) || empty($body["technologies"]) || empty($body["salary"]) || empty($body["company"])) {
             return $this->json([
-                "status" => false,
                 "message" => "Invalid data in the request body"
             ], 422);
         }
@@ -58,12 +61,13 @@ class OfferController extends AbstractController
         $offer->setLocation($body["location"]);
         $offer->setSalary(intval($body["salary"]));
         $offer->setTechnologies($body["technologies"]);
+        $offer->setCompany($body["company"]);
+        $offer->addAddedBy($currentUser);
 
         $this->em->persist($offer);
         $this->em->flush();
 
         return $this->json([
-            "status" => true,
             "message" => "offer created"
         ]);
     }

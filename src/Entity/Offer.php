@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OfferRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +30,17 @@ class Offer
 
     #[ORM\Column(length: 255)]
     private ?string $location = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Company = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'offers')]
+    private Collection $AddedBy;
+
+    public function __construct()
+    {
+        $this->AddedBy = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +103,42 @@ class Offer
     public function setLocation(string $location): static
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    public function getCompany(): ?string
+    {
+        return $this->Company;
+    }
+
+    public function setCompany(string $Company): static
+    {
+        $this->Company = $Company;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAddedBy(): Collection
+    {
+        return $this->AddedBy;
+    }
+
+    public function addAddedBy(User $addedBy): static
+    {
+        if (!$this->AddedBy->contains($addedBy)) {
+            $this->AddedBy->add($addedBy);
+        }
+
+        return $this;
+    }
+
+    public function removeAddedBy(User $addedBy): static
+    {
+        $this->AddedBy->removeElement($addedBy);
 
         return $this;
     }
