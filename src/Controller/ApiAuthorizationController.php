@@ -66,6 +66,7 @@ class ApiAuthorizationController extends AbstractController
         if ($currentUser instanceof User) {
             $offers = array_map(function ($offer) {
                 return [
+                    "id" => $offer->getId(),
                     "title" => $offer->getTitle(),
                     "description" => $offer->getDescription(),
                     "salary" => $offer->getSalary(),

@@ -29,6 +29,7 @@ class OfferController extends AbstractController
 
         $offersArray = array_map(function ($offer) {
             return [
+                "id" => $offer->getId(),
                 "title" => $offer->getTitle(),
                 "description" => $offer->getDescription(),
                 "salary" => $offer->getSalary(),
@@ -69,6 +70,30 @@ class OfferController extends AbstractController
 
         return $this->json([
             "message" => "offer created"
+        ]);
+    }
+    #[Route('/api/offer/{id}', name: 'get_offer', methods: ["GET"])]
+    public function getOffer(int $id)
+    {
+        $offer = $this->offerRepository->find($id);
+
+        if (empty($offer)) {
+            return $this->json([
+                "message" => "This offer is not found!"
+            ], 404);
+        };
+
+        $offerObject = [
+            "id" => $offer->getId(),
+            "title" => $offer->getTitle(),
+            "description" => $offer->getDescription(),
+            "salary" => $offer->getSalary(),
+            "technologies" => $offer->getTechnologies(),
+            "location" => $offer->getLocation(),
+            "company" => $offer->getCompany(),
+        ];
+        return $this->json([
+            "offer" => $offerObject
         ]);
     }
 }
