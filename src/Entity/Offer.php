@@ -37,6 +37,15 @@ class Offer
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'offers')]
     private Collection $AddedBy;
 
+    #[ORM\Column(length: 255)]
+    private ?string $experience = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $company_website = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $job_type = null;
+
     public function __construct()
     {
         $this->AddedBy = new ArrayCollection();
@@ -139,6 +148,42 @@ class Offer
     public function removeAddedBy(User $addedBy): static
     {
         $this->AddedBy->removeElement($addedBy);
+
+        return $this;
+    }
+
+    public function getExperience(): ?string
+    {
+        return $this->experience;
+    }
+
+    public function setExperience(string $experience): static
+    {
+        $this->experience = $experience;
+
+        return $this;
+    }
+
+    public function getCompanyWebsite(): ?string
+    {
+        return $this->company_website;
+    }
+
+    public function setCompanyWebsite(string $company_website): static
+    {
+        $this->company_website = $company_website;
+
+        return $this;
+    }
+
+    public function getJobType(): ?string
+    {
+        return $this->job_type;
+    }
+
+    public function setJobType(string $job_type): static
+    {
+        $this->job_type = $job_type;
 
         return $this;
     }

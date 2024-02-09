@@ -36,6 +36,9 @@ class ApiOfferController extends AbstractController
                 "technologies" => $offer->getTechnologies(),
                 "location" => $offer->getLocation(),
                 "company" => $offer->getCompany(),
+                "job_type" => $offer->getJobType(),
+                "experience" => $offer->GetExperience(),
+                "company_website" => $offer->getCompanyWebsite()
             ];
         }, $offers);
 
@@ -50,7 +53,7 @@ class ApiOfferController extends AbstractController
         $body = json_decode($request->getContent(), true);
         $currentUser = $this->getUser();
 
-        if (empty($body["title"]) || empty($body["description"]) || empty($body["location"]) || empty($body["technologies"]) || empty($body["salary"]) || empty($body["company"])) {
+        if (empty($body["title"]) || empty($body["description"]) || empty($body["location"]) || empty($body["technologies"]) || empty($body["salary"]) || empty($body["company"]) || empty($body["experience"]) || empty($body["company_website"]) || empty($body["job_type"])) {
             return $this->json([
                 "message" => "Invalid data in the request body"
             ], 422);
@@ -63,6 +66,9 @@ class ApiOfferController extends AbstractController
         $offer->setSalary(intval($body["salary"]));
         $offer->setTechnologies($body["technologies"]);
         $offer->setCompany($body["company"]);
+        $offer->setExperience($body["experience"]);
+        $offer->setCompanyWebsite($body["company_website"]);
+        $offer->setJobType($body["job_type"]);
         $offer->addAddedBy($currentUser);
 
         $this->em->persist($offer);
@@ -72,28 +78,21 @@ class ApiOfferController extends AbstractController
             "message" => "offer created"
         ]);
     }
-    #[Route('/api/offer/{id}', name: 'get_offer', methods: ["GET"])]
-    public function getOffer(int $id)
+    #[Route('/api/offer/{id}', name: "delete_offer", methods: ["delete"])]
+    public function deleteOffer(Int $id)
     {
-        $offer = $this->offerRepository->find($id);
+        $offer  = $this->offerRepository->find($id);
 
         if (empty($offer)) {
             return $this->json([
-                "message" => "This offer is not found!"
+                "message" => "offer not found"
             ], 404);
-        };
+        }
+        $this->em->remove($offer);
+        $this->em->flush();
 
-        $offerObject = [
-            "id" => $offer->getId(),
-            "title" => $offer->getTitle(),
-            "description" => $offer->getDescription(),
-            "salary" => $offer->getSalary(),
-            "technologies" => $offer->getTechnologies(),
-            "location" => $offer->getLocation(),
-            "company" => $offer->getCompany(),
-        ];
         return $this->json([
-            "offer" => $offerObject
+            "message" => "offer deleted"
         ]);
     }
 }
